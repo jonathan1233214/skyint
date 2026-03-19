@@ -13,7 +13,7 @@ export function Header({ liveCount, user, onSignOut }: HeaderProps) {
   const router = useRouter()
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-[9999] h-12 bg-surface-2 border-b border-border-subtle flex items-center px-4 gap-4">
+    <header className="fixed top-0 left-0 right-0 z-[9999] h-12 bg-surface-2 border-b border-border-subtle flex items-center px-4 gap-3">
       {/* Logo */}
       <div
         className="flex items-center gap-2 flex-shrink-0 cursor-pointer"
@@ -33,17 +33,17 @@ export function Header({ liveCount, user, onSignOut }: HeaderProps) {
 
       <div className="flex-1" />
 
-      {/* + Report */}
+      {/* + Report — desktop only */}
       <button
         onClick={() => router.push('/report')}
-        className="font-mono text-xs text-surface-1 bg-accent hover:bg-accent-dim rounded px-3 py-1 transition-colors font-bold"
+        className="hidden md:inline-flex font-mono text-xs text-surface-1 bg-accent hover:bg-accent-dim rounded px-3 py-1 transition-colors font-bold"
       >
         + REPORT
       </button>
 
-      {/* Auth */}
+      {/* Auth — desktop only */}
       {user ? (
-        <div className="flex items-center gap-3">
+        <div className="hidden md:flex items-center gap-3">
           <span className="font-mono text-xs text-text-secondary truncate max-w-[160px]">
             {user.email}
           </span>
@@ -57,7 +57,7 @@ export function Header({ liveCount, user, onSignOut }: HeaderProps) {
       ) : (
         <button
           onClick={() => router.push('/login')}
-          className="font-mono text-xs text-surface-1 bg-accent hover:bg-accent-dim rounded px-3 py-1 transition-colors font-bold"
+          className="hidden md:inline-flex font-mono text-xs text-surface-1 bg-accent hover:bg-accent-dim rounded px-3 py-1 transition-colors font-bold"
         >
           SIGN IN
         </button>
