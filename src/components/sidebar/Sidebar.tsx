@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useMemo } from 'react'
+import { useRouter } from 'next/navigation'
 import { ReportCard } from './ReportCard'
 import type { Report } from '@/types/database'
 
@@ -70,6 +71,7 @@ function activityDot(count: number): string {
 }
 
 export function Sidebar({ reports, onReportClick }: SidebarProps) {
+  const router = useRouter()
   const [activeTab, setActiveTab] = useState<Tab>('feed')
 
   const callsigns = useMemo(() => {
@@ -140,9 +142,14 @@ export function Sidebar({ reports, onReportClick }: SidebarProps) {
         {activeTab === 'feed' && (
           <div className="p-2 flex flex-col gap-2">
             {visibleReports.length === 0 ? (
-              <div className="text-center text-text-muted font-mono text-xs py-8">
-                NO REPORTS YET<br />
-                <span className="text-text-muted/60">Click map to submit</span>
+              <div className="flex flex-col items-center justify-center py-12 gap-4">
+                <p className="font-mono text-xs text-text-muted">NO REPORTS YET</p>
+                <button
+                  onClick={() => router.push('/report')}
+                  className="bg-accent hover:bg-accent-dim text-surface-1 font-mono font-bold text-xs px-4 py-2 rounded transition-colors"
+                >
+                  + REPORT
+                </button>
               </div>
             ) : (
               visibleReports.map((report) => (
