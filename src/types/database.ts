@@ -1,4 +1,4 @@
-export type ReportType = 'aircraft' | 'radio' | 'visual' | 'alert'
+export type ReportType = 'aircraft' | 'radio' | 'visual' | 'alert' | 'intercept' | 'aircraft_note'
 export type ConfidenceLevel = 'low' | 'medium' | 'high' | 'confirmed'
 
 export interface Report {

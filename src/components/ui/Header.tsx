@@ -1,19 +1,24 @@
 'use client'
 
-import { useAuth } from '@/hooks/useAuth'
+import { useRouter } from 'next/navigation'
+import type { User } from '@supabase/supabase-js'
 
 interface HeaderProps {
   liveCount: number
-  onAuthClick: () => void
+  user: User | null
+  onSignOut: () => void
 }
 
-export function Header({ liveCount, onAuthClick }: HeaderProps) {
-  const { user, signOut } = useAuth()
+export function Header({ liveCount, user, onSignOut }: HeaderProps) {
+  const router = useRouter()
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 h-12 bg-surface-2 border-b border-border-subtle flex items-center px-4 gap-4">
+    <header className="fixed top-0 left-0 right-0 z-[9999] h-12 bg-surface-2 border-b border-border-subtle flex items-center px-4 gap-4">
       {/* Logo */}
-      <div className="flex items-center gap-2 flex-shrink-0">
+      <div
+        className="flex items-center gap-2 flex-shrink-0 cursor-pointer"
+        onClick={() => router.push('/')}
+      >
         <span className="text-accent text-lg">⬡</span>
         <span className="font-mono font-bold text-text-primary tracking-widest text-sm">
           SKY<span className="text-accent">INT</span>
@@ -28,6 +33,14 @@ export function Header({ liveCount, onAuthClick }: HeaderProps) {
 
       <div className="flex-1" />
 
+      {/* + Report */}
+      <button
+        onClick={() => router.push('/report')}
+        className="font-mono text-xs text-surface-1 bg-accent hover:bg-accent-dim rounded px-3 py-1 transition-colors font-bold"
+      >
+        + REPORT
+      </button>
+
       {/* Auth */}
       {user ? (
         <div className="flex items-center gap-3">
@@ -35,7 +48,7 @@ export function Header({ liveCount, onAuthClick }: HeaderProps) {
             {user.email}
           </span>
           <button
-            onClick={signOut}
+            onClick={onSignOut}
             className="font-mono text-xs text-text-secondary hover:text-text-primary border border-border-subtle rounded px-2 py-1 transition-colors"
           >
             LOGOUT
@@ -43,7 +56,7 @@ export function Header({ liveCount, onAuthClick }: HeaderProps) {
         </div>
       ) : (
         <button
-          onClick={onAuthClick}
+          onClick={() => router.push('/login')}
           className="font-mono text-xs text-surface-1 bg-accent hover:bg-accent-dim rounded px-3 py-1 transition-colors font-bold"
         >
           SIGN IN

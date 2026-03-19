@@ -46,8 +46,28 @@ export function ReportCard({ report, onClick }: ReportCardProps) {
       </div>
 
       <p className="text-xs text-text-secondary leading-relaxed line-clamp-2 mb-2">
-        {report.description}
+        {(() => {
+          try {
+            const d = JSON.parse(report.description)
+            return d.notes ?? report.description
+          } catch {
+            return report.description
+          }
+        })()}
       </p>
+      {(() => {
+        try {
+          const d = JSON.parse(report.description)
+          return (
+            <div className="flex flex-wrap gap-x-3 gap-y-0.5 mb-2">
+              {d.aircraft_type && <span className="font-mono text-xs text-text-muted">{d.aircraft_type}</span>}
+              {d.route         && <span className="font-mono text-xs text-text-muted">✈ {d.route}</span>}
+              {d.frequency     && <span className="font-mono text-xs text-accent">{d.frequency} MHz</span>}
+              {d.location      && <span className="font-mono text-xs text-text-muted">📍 {d.location}</span>}
+            </div>
+          )
+        } catch { return null }
+      })()}
 
       <div className="flex items-center justify-between text-xs text-text-muted font-mono">
         <span>{report.user_email?.split('@')[0] ?? 'anon'}</span>

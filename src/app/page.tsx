@@ -1,93 +1,66 @@
 'use client'
 
-export const dynamic = 'force-dynamic'
-
 import nextDynamic from 'next/dynamic'
-import { useState, useCallback } from 'react'
+import { useState } from 'react'
 import { Header } from '@/components/ui/Header'
 import { Sidebar } from '@/components/sidebar/Sidebar'
-import { AuthModal } from '@/components/modals/AuthModal'
-import { ReportModal } from '@/components/modals/ReportModal'
+import { AircraftNotesPanel } from '@/components/modals/AircraftNotesPanel'
 import { useReports } from '@/hooks/useReports'
-import { useOpenSky } from '@/hooks/useOpenSky'
+import { useLiveFlights } from '@/hooks/useLiveFlights'
 import { useAuth } from '@/hooks/useAuth'
-import type { Report } from '@/types/database'
+import type { Report, AircraftTrack } from '@/types/database'
 
-// SSR must be disabled for Leaflet
-const MapView = nextDynamic(() => import('@/components/map/MapView').then(m => m.MapView), {
-  ssr: false,
-  loading: () => (
-    <div className="w-full h-full flex items-center justify-center bg-surface-1">
-      <div className="font-mono text-text-muted text-sm animate-pulse">INITIALIZING MAP...</div>
-    </div>
-  ),
-})
+const MapView = nextDynamic(
+  () => import('@/components/map/MapView').then((m) => m.MapView),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="w-full h-full flex items-center justify-center bg-surface-1">
+        <div className="font-mono text-text-muted text-sm animate-pulse">INITIALIZING MAP...</div>
+      </div>
+    ),
+  }
+)
 
 export default function Home() {
-  const { user } = useAuth()
-  const { reports, refetch } = useReports()
-  const { aircraft } = useOpenSky()
+  const { user, signOut } = useAuth()
+  const { reports } = useReports()
+  const { aircraft } = useLiveFlights()
+  const [selectedAircraft, setSelectedAircraft] = useState<AircraftTrack | null>(null)
 
-  const [showAuth, setShowAuth] = useState(false)
-  const [pendingLocation, setPendingLocation] = useState<{ lat: number; lng: number } | null>(null)
-  const handleMapClick = useCallback((lat: number, lng: number) => {
-    if (!user) {
-      setShowAuth(true)
-      return
-    }
-    setPendingLocation({ lat, lng })
-  }, [user])
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const handleReportClick = useCallback((_report: Report) => {
-    // Reports open via Leaflet popup — future: open detail panel
-  }, [])
-
-  const liveCount = aircraft.length + reports.filter(r => {
-    const age = Date.now() - new Date(r.created_at).getTime()
-    return age < 3600000 // last hour
-  }).length
+  const liveCount =
+    aircraft.length +
+    reports.filter((r) => {
+      if (r.type === 'aircraft_note') return false
+      return Date.now() - new Date(r.created_at).getTime() < 3_600_000
+    }).length
 
   return (
     <div className="h-screen flex flex-col overflow-hidden">
-      <Header
-        liveCount={liveCount}
-        onAuthClick={() => setShowAuth(true)}
-      />
+      <Header liveCount={liveCount} user={user} onSignOut={signOut} />
 
-      <div className="flex flex-1 pt-12 overflow-hidden">
+      <div className="flex flex-1 overflow-hidden" style={{ marginTop: '48px' }}>
         <Sidebar
           reports={reports}
-          onReportClick={handleReportClick}
+          onReportClick={(_report: Report) => {}}
         />
 
-        {/* Map area */}
-        <main className="flex-1 ml-[300px] relative">
+        <main className="flex-1 ml-[300px] relative overflow-hidden">
           <MapView
             reports={reports}
             aircraft={aircraft}
-            onMapClick={handleMapClick}
-            onReportClick={handleReportClick}
+            onMapClick={() => {}}
+            onReportClick={(_report: Report) => {}}
+            onAircraftClick={(track) => setSelectedAircraft(track)}
           />
-
-          {/* Click hint overlay */}
-          {user && (
-            <div className="absolute bottom-4 right-4 bg-surface-2/90 border border-border-subtle rounded px-3 py-2 font-mono text-xs text-text-muted pointer-events-none">
-              CLICK MAP TO REPORT
-            </div>
-          )}
         </main>
       </div>
 
-      {/* Modals */}
-      {showAuth && <AuthModal onClose={() => setShowAuth(false)} />}
-
-      {pendingLocation && user && (
-        <ReportModal
-          lat={pendingLocation.lat}
-          lng={pendingLocation.lng}
-          onClose={() => setPendingLocation(null)}
-          onSubmitted={refetch}
+      {selectedAircraft && (
+        <AircraftNotesPanel
+          track={selectedAircraft}
+          onClose={() => setSelectedAircraft(null)}
+          onAuthRequired={() => setSelectedAircraft(null)}
         />
       )}
     </div>

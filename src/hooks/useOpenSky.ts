@@ -4,9 +4,7 @@
 import { useEffect, useState, useRef } from 'react'
 import type { AircraftTrack } from '@/types/database'
 
-// Bounding box: Israel/Middle East corridor
-const BBOX = { lamin: 29.0, lomin: 33.0, lamax: 34.5, lomax: 36.5 }
-const POLL_INTERVAL = 30000 // 30 seconds
+const POLL_INTERVAL = 60_000 // 60 seconds — respects OpenSky anonymous rate limit
 
 export function useOpenSky() {
   const [aircraft, setAircraft] = useState<AircraftTrack[]>([])
@@ -16,32 +14,33 @@ export function useOpenSky() {
 
   const fetchAircraft = async () => {
     try {
-      const params = new URLSearchParams({
-        lamin: String(BBOX.lamin),
-        lomin: String(BBOX.lomin),
-        lamax: String(BBOX.lamax),
-        lomax: String(BBOX.lomax),
-      })
-      const res = await fetch(`https://opensky-network.org/api/states/all?${params}`)
-      if (!res.ok) throw new Error(`OpenSky error: ${res.status}`)
+      const res = await fetch('/api/aircraft')
+      if (!res.ok) throw new Error(`OpenSky proxy error: ${res.status}`)
       const data = await res.json()
 
-      const tracks: AircraftTrack[] = (data.states ?? []).map((s: any[]) => ({
-        icao24: s[0],
-        callsign: s[1]?.trim() || null,
-        lat: s[6],
-        lng: s[5],
-        altitude: s[7],
-        velocity: s[9],
-        heading: s[10],
-        on_ground: s[8],
-        last_contact: s[4],
-      })).filter((t: AircraftTrack) => t.lat !== null && t.lng !== null)
+      const raw = data.states ?? []
+      console.log(`[useOpenSky] API returned ${raw.length} states`)
 
+      const tracks: AircraftTrack[] = raw
+        .map((s: any[]) => ({
+          icao24:       s[0],
+          callsign:     s[1]?.trim() || null,
+          lat:          s[6],
+          lng:          s[5],
+          altitude:     s[7],
+          velocity:     s[9],
+          heading:      s[10],
+          on_ground:    s[8],
+          last_contact: s[4],
+        }))
+        .filter((t: AircraftTrack) => t.lat !== null && t.lng !== null)
+
+      console.log(`[useOpenSky] ${tracks.length} aircraft after filtering nulls`)
       setAircraft(tracks)
       setLastUpdated(new Date())
       setError(null)
     } catch (err: any) {
+      console.error('[useOpenSky] fetch error:', err.message)
       setError(err.message)
     }
   }
