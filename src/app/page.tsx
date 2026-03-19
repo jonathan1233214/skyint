@@ -16,8 +16,8 @@ const MapView = nextDynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="w-full h-full flex items-center justify-center bg-surface-1">
-        <div className="font-mono text-text-muted text-sm animate-pulse">INITIALIZING MAP...</div>
+      <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#0d1117' }}>
+        <div style={{ fontFamily: 'Space Mono, monospace', color: '#484f58', fontSize: 14 }}>INITIALIZING MAP...</div>
       </div>
     ),
   }
@@ -38,17 +38,18 @@ export default function Home() {
     }).length
 
   return (
-    <div className="h-screen flex flex-col overflow-hidden">
+    <div style={{ height: '100dvh', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
       <Header liveCount={liveCount} user={user} onSignOut={signOut} />
 
-      <div className="flex flex-1 overflow-hidden" style={{ marginTop: '48px' }}>
-        <Sidebar
-          reports={reports}
-          onReportClick={() => {}}
-        />
+      {/* Body: below header */}
+      <div style={{ display: 'flex', flex: 1, overflow: 'hidden', marginTop: 48 }}>
+        <Sidebar reports={reports} onReportClick={() => {}} />
 
-        {/* Map: full width on mobile, offset by sidebar on desktop */}
-        <main className="flex-1 md:ml-[300px] relative overflow-hidden">
+        {/* Map — map-wrapper class controls left margin via CSS */}
+        <main
+          className="map-wrapper"
+          style={{ flex: 1, position: 'relative', overflow: 'hidden' }}
+        >
           <MapView
             reports={reports}
             aircraft={aircraft}
@@ -59,10 +60,10 @@ export default function Home() {
         </main>
       </div>
 
-      {/* Floating + Report button — mobile only, above bottom nav */}
+      {/* Floating + Report — mobile only, controlled by CSS */}
       <button
+        className="mobile-fab"
         onClick={() => router.push('/report')}
-        className="md:hidden fixed bottom-20 right-4 z-[60] w-14 h-14 rounded-full bg-accent hover:bg-accent-dim text-surface-1 font-bold text-2xl flex items-center justify-center shadow-lg shadow-accent/30 transition-colors"
         aria-label="Submit report"
       >
         +
