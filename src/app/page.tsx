@@ -8,7 +8,7 @@ import { AircraftNotesPanel } from '@/components/modals/AircraftNotesPanel'
 import { useReports } from '@/hooks/useReports'
 import { useLiveFlights } from '@/hooks/useLiveFlights'
 import { useAuth } from '@/hooks/useAuth'
-import type { Report, AircraftTrack } from '@/types/database'
+import type { AircraftTrack } from '@/types/database'
 
 const MapView = nextDynamic(
   () => import('@/components/map/MapView').then((m) => m.MapView),
@@ -42,7 +42,7 @@ export default function Home() {
       <div className="flex flex-1 overflow-hidden" style={{ marginTop: '48px' }}>
         <Sidebar
           reports={reports}
-          onReportClick={(_report: Report) => {}}
+          onReportClick={() => {}}
         />
 
         <main className="flex-1 ml-[300px] relative overflow-hidden">
@@ -50,7 +50,7 @@ export default function Home() {
             reports={reports}
             aircraft={aircraft}
             onMapClick={() => {}}
-            onReportClick={(_report: Report) => {}}
+            onReportClick={() => {}}
             onAircraftClick={(track) => setSelectedAircraft(track)}
           />
         </main>
