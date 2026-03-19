@@ -8,9 +8,7 @@
   --foreground: #e6edf3;
 }
 
-* {
-  box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
 html, body {
   height: 100%;
@@ -20,132 +18,70 @@ html, body {
   color: #e6edf3;
 }
 
-/* Leaflet overrides */
-.leaflet-container {
-  background: #0d1117 !important;
+/* ── Leaflet ──────────────────────────────── */
+.leaflet-container              { background: #0d1117 !important; }
+.leaflet-popup-content-wrapper  { background: #161b22 !important; border: 1px solid #30363d !important; border-radius: 6px !important; color: #e6edf3 !important; box-shadow: 0 4px 20px rgba(0,0,0,.5) !important; }
+.leaflet-popup-tip              { background: #161b22 !important; }
+.leaflet-popup-close-button     { color: #8b949e !important; }
+.leaflet-control-zoom a         { background: #161b22 !important; color: #e6edf3 !important; border-color: #30363d !important; }
+.leaflet-control-zoom a:hover   { background: #21262d !important; color: #00e5a0 !important; }
+.leaflet-control-attribution    { background: rgba(13,17,23,.8) !important; color: #484f58 !important; }
+.leaflet-control-attribution a  { color: #8b949e !important; }
+
+/* ── Scrollbar ────────────────────────────── */
+::-webkit-scrollbar       { width: 4px; }
+::-webkit-scrollbar-track { background: #0d1117; }
+::-webkit-scrollbar-thumb { background: #30363d; border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: #484f58; }
+
+/* ── Pulse ────────────────────────────────── */
+@keyframes pulse-green { 0%,100% { opacity:1; } 50% { opacity:.4; } }
+.pulse-green { animation: pulse-green 2s ease-in-out infinite; }
+
+@layer utilities { .text-balance { text-wrap: balance; } }
+
+/* ═══════════════════════════════════════════════════════════════
+   LAYOUT CLASSES  — desktop defaults, mobile overrides
+═══════════════════════════════════════════════════════════════ */
+
+/* Desktop defaults */
+.desktop-sidebar { display: flex; }
+.desktop-only    { display: flex; }
+.mobile-only     { display: none; }
+
+/*
+  Map wrapper:
+  Desktop — flex child offset by sidebar
+  Mobile  — position:fixed so Leaflet has exact pixel bounds
+*/
+.map-wrapper {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  margin-left: 300px;
 }
 
-.leaflet-popup-content-wrapper {
-  background: #161b22 !important;
-  border: 1px solid #30363d !important;
-  border-radius: 6px !important;
-  color: #e6edf3 !important;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.5) !important;
-}
-
-.leaflet-popup-tip {
-  background: #161b22 !important;
-}
-
-.leaflet-popup-close-button {
-  color: #8b949e !important;
-}
-
-.leaflet-control-zoom a {
-  background: #161b22 !important;
-  color: #e6edf3 !important;
-  border-color: #30363d !important;
-}
-
-.leaflet-control-zoom a:hover {
-  background: #21262d !important;
-  color: #00e5a0 !important;
-}
-
-.leaflet-control-attribution {
-  background: rgba(13,17,23,0.8) !important;
-  color: #484f58 !important;
-}
-
-.leaflet-control-attribution a {
-  color: #8b949e !important;
-}
-
-/* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 4px;
-}
-::-webkit-scrollbar-track {
-  background: #0d1117;
-}
-::-webkit-scrollbar-thumb {
-  background: #30363d;
-  border-radius: 2px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: #484f58;
-}
-
-/* Pulse animation for live indicator */
-@keyframes pulse-green {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.4; }
-}
-
-.pulse-green {
-  animation: pulse-green 2s ease-in-out infinite;
-}
-
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
-}
-
-/* ═══════════════════════════════════════════════════
-   RESPONSIVE LAYOUT — desktop defaults, mobile overrides
-═══════════════════════════════════════════════════ */
-
-/* Desktop: show sidebar, hide mobile chrome */
-.desktop-sidebar       { display: flex; }
-.map-wrapper           { margin-left: 300px; }
-.header-desktop-only   { display: flex; }
-.mobile-fab            { display: none; }
-.mobile-bottom-nav     { display: none; }
-.mobile-drawer-wrap    { display: none; }
-
-/* Mobile: hide sidebar, show mobile chrome */
+/* ── Mobile overrides ─────────────────────── */
 @media (max-width: 768px) {
-  .desktop-sidebar     { display: none !important; }
-  .map-wrapper         { margin-left: 0 !important; }
-  .header-desktop-only { display: none !important; }
+  /* Kill the desktop sidebar entirely */
+  .desktop-sidebar { display: none !important; }
+  .desktop-only    { display: none !important; }
 
-  .mobile-fab {
-    display: flex !important;
-    position: fixed;
-    bottom: 80px;       /* sits above the 56px bottom nav */
-    right: 16px;
-    z-index: 60;
-    width: 56px;
-    height: 56px;
-    border-radius: 50%;
-    background: #00e5a0;
-    color: #0d1117;
-    font-size: 28px;
-    font-weight: 700;
-    align-items: center;
-    justify-content: center;
-    border: none;
-    cursor: pointer;
-    box-shadow: 0 4px 20px rgba(0,229,160,0.35);
-    transition: background 0.15s;
-  }
-  .mobile-fab:hover     { background: #00b87d; }
+  /* Show mobile chrome */
+  .mobile-only { display: block; }
 
-  .mobile-bottom-nav {
-    display: flex !important;
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    z-index: 55;
-    height: 56px;
-    background: #161b22;
-    border-top: 1px solid #30363d;
-    align-items: stretch;
-  }
-
-  .mobile-drawer-wrap {
-    display: block !important;
+  /*
+    Map gets fixed position so Leaflet always fills
+    exactly the area between header (48px) and bottom nav (56px).
+  */
+  .map-wrapper {
+    position: fixed !important;
+    top: 48px   !important;
+    left: 0     !important;
+    right: 0    !important;
+    bottom: 56px !important;
+    margin: 0   !important;
+    flex: none  !important;
+    overflow: hidden !important;
   }
 }
